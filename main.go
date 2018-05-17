@@ -29,7 +29,6 @@ func main(){
 	router := httprouter.New()
 
 	router.GET("/api/users", getUsers)
-	router.GET("/api/users/:id", getUser)
 	router.POST("/api/users", addUser)
 	router.DELETE("/api/users/:id", deleteUser)
 
@@ -40,11 +39,13 @@ func initDb(){
 
 	var err error
 	db, err = sql.Open("sqlite3", "testApi.db")
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS people("id" INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,"name" TEXT, "phone" TEXT)`)
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -66,7 +67,7 @@ func getUsers(w http.ResponseWriter, r *http.Request, _ httprouter.Params)  {
 
 	users, err := read(strName)
 
-	fmt.Fprintf(w, "%v", users)
+	fmt.Fprintf(w, "%+v", users)
 
 	if err != nil {
 		w.WriteHeader(500)
@@ -78,10 +79,6 @@ func getUsers(w http.ResponseWriter, r *http.Request, _ httprouter.Params)  {
 	if err = json.NewEncoder(w).Encode(strName); err != nil {
 		w.WriteHeader(500)
 	}
-}
-
-func getUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params)  {
-	fmt.Fprintf(w,"Hell0")
 }
 
 func addUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params)  {
@@ -165,11 +162,11 @@ func read(id string) ([]User, error) {
 
 func remove(id int) error {
 
-		_, err := db.Exec("DELETE FROM people WHERE id = $1", id)
+	_, err := db.Exec("DELETE FROM people WHERE id = $1", id)
 
-		if err != nil{
-			return err
-		}
+	if err != nil{
+		return err
+	}
 
 	return nil
 }
